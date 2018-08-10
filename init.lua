@@ -11,10 +11,15 @@ local prn = minetest.chat_send_all
 -- it gets scaled down according to the size down below.
 local bsz = {x=1,y=1}
 local b = 0.5
+local tb = "tinycubes_tinycube_"
+local tx = tb.."x.png"
+local ty = tb.."y.png"
+local tz = tb.."z.png"
 minetest.register_entity(entity, {
 	hp_max = 1,
 	visual="cube",
 	visual_size=bsz,
+	textures = {tx, tx, ty, ty, tz, tz},
 	physical=true,
 	collide_with_objects=true,
 	on_rightclick = function(self, clicker)
