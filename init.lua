@@ -107,20 +107,27 @@ local align = function(v, sp)
 	print("v", v, "r", r)
 	return r
 end
-local align_tiny_pos_mut = function(pos, sp)
-	pos.x = align(pos.x, sp)
-	pos.y = align(pos.y, sp)
-	pos.z = align(pos.z, sp)
-	return pos
+
+-- align a position to a cube (returns bare x, y, z vars)
+local align_tiny_pos_raw = function(sp, x, y, z)
+	local ax = align(x, sp)
+	local ay = align(y, sp)
+	local az = align(z, sp)
+	return ax, ay, az
 end
 
--- adds a tiny entity at a position (mutates pos!)
+-- adds a tiny entity at a position (takes bare xyz variables)
+-- if noalign is true, the entity is allowed to be off-grid.
 local s = {}
-local add_tiny_cube_mut = function(pos, sp)
-	local aligned = align_tiny_pos_mut(pos, sp)
+local tpos = {}
+local add_tiny_cube_raw = function(sp, x, y, z, noalign)
+	if not noalign then
+		x, y, z = align_tiny_pos_raw(sp, x, y, z)
+	end
 	s.scale = sp
 	local data = minetest.serialize(s)
-	local ent = minetest.add_entity(aligned, entity, data)
+	tpos.x, tpos.y, tpos.z = x, y, z
+	local ent = minetest.add_entity(tpos, entity, data)
 	return ent
 end
 
@@ -139,7 +146,7 @@ local on_place = function(itemstack, user, pointed)
 	-- add this to the surface pos to make sure positions round in the way we want.
 	local bp = 4
 	local target = vector.add(pointed.surface, offset)
-	add_tiny_cube_mut(target, bp)
+	add_tiny_cube_raw(bp, target.x, target.y, target.z)
 end
 
 local item = mn..":tinycubetool"
