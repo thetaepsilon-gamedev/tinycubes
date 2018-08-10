@@ -7,6 +7,48 @@ local c = 1 / cf
 
 local prn = minetest.chat_send_all
 
+-- on_activate and staticdata helpers:
+-- assume that staticdata is lua serialised data.
+-- on_activate is actually a wrapper around an inner function taking deserialised data.
+-- if this function returns a false value, destroy the object.
+local lua_get_staticdata = function(self)
+	return minetest.serialize(self.config)
+end
+local mk_on_deserialize = function(inner)
+	return function(self, staticdata, dtime_s)
+		local config = minetest.deserialize(staticdata)
+		local keep = inner(self, config, dtime_s)
+		if not keep then self.object:remove() end
+	end
+end
+
+-- on_deserialize for little cubes:
+-- currently just sets the size to the correct scale.
+local sfp = function(p) return math.pow(2, p) end
+local scale_max = 4
+local cube_on_deserialize = function(self, config, dtime_s)
+	local scale = config.scale
+	-- sanity limits on scale power
+	if not scale or scale < 0 or scale > scale_max then
+		return false
+	end
+
+	-- adjust static properties to match size
+	local ent = self.object
+	-- side length out from center of cube is half of cube fraction
+	local s = 1 / sfp(scale)
+	local c = 1 / sfp(scale + 1)
+	ent:set_properties({
+		collisionbox={-c,-c,-c,c,c,c},
+		visual_size={x=s,y=s}
+	})
+
+	self.config = config
+	return true
+end
+
+
+
 -- the base cube entity.
 -- it gets scaled down according to the size down below.
 local bsz = {x=1,y=1}
@@ -25,6 +67,8 @@ minetest.register_entity(entity, {
 	on_rightclick = function(self, clicker)
 		prn("clicky")
 	end,
+	get_staticdata = lua_get_staticdata,
+	on_activate = mk_on_deserialize(cube_on_deserialize),
 })
 
 
@@ -56,7 +100,6 @@ end
 -- to place a tiny cube, we align it to the small grid they exist in.
 -- scale power is the power of two of the grid size;
 -- 1 is 1/2, 2 is 1/(2^2) = 1/4, 3 is 1/8 etc.
-local sfp = function(p) return math.pow(2, p) end
 local align = function(v, sp)
 	local sf = sfp(sp)
 	local c = 1 / (2 * sf)
@@ -72,16 +115,12 @@ local align_tiny_pos_mut = function(pos, sp)
 end
 
 -- adds a tiny entity at a position (mutates pos!)
+local s = {}
 local add_tiny_cube_mut = function(pos, sp)
 	local aligned = align_tiny_pos_mut(pos, sp)
-	local ent = minetest.add_entity(aligned, entity)
-	local sf = sfp(sp)
-	local sfd = 1 / sf
-	local cfd = 1 / (sf * 2)
-	ent:set_properties({
-		visual_size={x=sfd,y=sfd},
-		collisionbox={-cfd,-cfd,-cfd,cfd,cfd,cfd}
-	})
+	s.scale = sp
+	local data = minetest.serialize(s)
+	local ent = minetest.add_entity(aligned, entity, data)
 	return ent
 end
 
