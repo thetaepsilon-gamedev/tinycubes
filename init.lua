@@ -6,6 +6,7 @@ local cf = 2 * sf
 local c = 1 / cf
 
 local prn = minetest.chat_send_all
+local i = {}
 
 -- on_activate and staticdata helpers:
 -- assume that staticdata is lua serialised data.
@@ -130,6 +131,7 @@ local add_tiny_cube_raw = function(sp, x, y, z, noalign)
 	local ent = minetest.add_entity(tpos, entity, data)
 	return ent
 end
+i.add_tiny_cube_raw = add_tiny_cube_raw
 
 
 
@@ -155,4 +157,9 @@ minetest.register_craftitem(item, {
 	on_place = on_use_only("node", on_use_surface(on_place)),
 })
 
+
+
+-- export interface table
+local path = "ds2.minetest.tinycubes"
+modtable_register(path, i)
 
