@@ -1,3 +1,5 @@
+local unwrap = mtrequire("ds2.minetest.vectorextras.unwrap")
+
 local mn = minetest.get_current_modname()
 local entity = mn..":tinycube"
 local sf = 16
@@ -132,6 +134,14 @@ local add_tiny_cube_raw = function(sp, x, y, z, noalign)
 	return ent
 end
 i.add_tiny_cube_raw = add_tiny_cube_raw
+
+-- wrapped version of the above for convenience,
+-- when passed a pos table from something in the MT API
+local add_tiny_cube = function(sp, pos, noalign)
+	local x, y, z = unwrap(pos)
+	return add_tiny_cube_raw(sp, x, y, z, noalign)
+end
+i.add_tiny_cube = add_tiny_cube
 
 
 
