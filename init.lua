@@ -3,10 +3,6 @@ local unwrap = mtrequire("ds2.minetest.vectorextras.unwrap")
 local mn = minetest.get_current_modname()
 local mp = minetest.get_modpath(mn).."/"
 local entity = mn..":tinycube"
-local sf = 16
-local s = 1 / sf
-local cf = 2 * sf
-local c = 1 / cf
 
 local prn = minetest.chat_send_all
 local i = {}
