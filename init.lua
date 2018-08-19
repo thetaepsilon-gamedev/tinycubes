@@ -11,17 +11,20 @@ local prn = minetest.chat_send_all
 local i = {}
 
 -- on_activate and staticdata helpers:
--- assume that staticdata is lua serialised data.
--- on_activate is actually a wrapper around an inner function taking deserialised data.
--- if this function returns a false value, destroy the object.
+-- load lua properties from a serialised string.
+-- we don't implement updating physical properties on config updates,
+-- so instead, assuming the string was valid lua,
+-- we simply store the serialised string for later saving via get_staticdata.
+-- this means that it is simpler to spawn a new cube and remove the old one.
 local lua_get_staticdata = function(self)
-	return minetest.serialize(self.config)
+	return self.__serialised
 end
 local mk_on_deserialize = function(inner)
 	return function(self, staticdata, dtime_s)
 		local config = minetest.deserialize(staticdata)
 		local keep = inner(self, config, dtime_s)
 		if not keep then self.object:remove() end
+		self.__serialised = staticdata
 	end
 end
 
