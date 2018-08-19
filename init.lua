@@ -84,6 +84,10 @@ local on_use_only = function(type, f)
 		end
 	end
 end
+-- combine the two to only use for placing on a surface.
+local on_use_surface_only = function(f)
+	return on_use_only("node", on_use_surface(f))
+end
 
 
 
@@ -152,7 +156,7 @@ end
 local item = mn..":tinycubetool"
 minetest.register_craftitem(item, {
 	inventory_image = t,
-	on_place = on_use_only("node", on_use_surface(on_place)),
+	on_place = on_use_surface_only(on_place),
 })
 
 
