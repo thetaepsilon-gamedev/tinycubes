@@ -1,6 +1,7 @@
 local unwrap = mtrequire("ds2.minetest.vectorextras.unwrap")
 
 local mn = minetest.get_current_modname()
+local mp = minetest.get_modpath(mn).."/"
 local entity = mn..":tinycube"
 local sf = 16
 local s = 1 / sf
@@ -10,23 +11,11 @@ local c = 1 / cf
 local prn = minetest.chat_send_all
 local i = {}
 
--- on_activate and staticdata helpers:
--- load lua properties from a serialised string.
--- we don't implement updating physical properties on config updates,
--- so instead, assuming the string was valid lua,
--- we simply store the serialised string for later saving via get_staticdata.
--- this means that it is simpler to spawn a new cube and remove the old one.
-local lua_get_staticdata = function(self)
-	return self.__serialised
-end
-local mk_on_deserialize = function(inner)
-	return function(self, staticdata, dtime_s)
-		local config = minetest.deserialize(staticdata)
-		local keep = inner(self, config, dtime_s)
-		if not keep then self.object:remove() end
-		self.__serialised = staticdata
-	end
-end
+local m_deserial = dofile(mp.."deserialize.lua")
+local lua_get_staticdata = m_deserial.lua_get_staticdata
+local mk_on_deserialize = m_deserial.mk_on_deserialize
+
+
 
 -- on_deserialize for little cubes:
 -- currently just sets the size to the correct scale.
