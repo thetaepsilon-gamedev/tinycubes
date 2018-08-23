@@ -11,6 +11,12 @@ local m_deserial = dofile(mp.."deserialize.lua")
 local lua_get_staticdata = m_deserial.lua_get_staticdata
 local mk_on_deserialize = m_deserial.mk_on_deserialize
 
+local m_texmap = dofile(mp.."texture_mapping.lua")
+local create_textures = m_texmap.create_textures
+
+local m_query = dofile(mp.."texture_query.lua")
+local texq = m_query.texq
+
 
 
 -- on_deserialize for little cubes:
@@ -24,6 +30,12 @@ local cube_on_deserialize = function(self, config, dtime_s)
 		return false
 	end
 
+	-- load specified surface textures, if any exist
+	local textures
+	if config.surfaces then
+		textures = create_textures(texq, config.surfaces)
+	end
+
 	-- adjust static properties to match size
 	local ent = self.object
 	-- side length out from center of cube is half of cube fraction
@@ -31,7 +43,8 @@ local cube_on_deserialize = function(self, config, dtime_s)
 	local c = 1 / sfp(scale + 1)
 	ent:set_properties({
 		collisionbox={-c,-c,-c,c,c,c},
-		visual_size={x=s,y=s}
+		visual_size={x=s,y=s},
+		textures=textures,
 	})
 
 	self.config = config
