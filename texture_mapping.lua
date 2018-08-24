@@ -52,7 +52,7 @@ query :: node_material -> Int -> Maybe (String, Int, Int)
 -- returns :: Maybe (texturespec, x, y, w, h)
 local floor = math.floor
 local ceil = math.ceil
-local map_to_pixels = function(texq, node, faceid, u1, v1, u2, v2)
+local map_to_pixels = function(texq, node, u1, v1, u2, v2)
 	local texture, width, height = texq(node)
 	-- if texture query returns nil, we return nil also.
 	-- this allows create_uv_texture_spec() below
@@ -139,7 +139,7 @@ local create_spec_from_properties = function(texq, index, properties)
 	if properties == nil then return transparent end
 
 	local p = properties
-	return create_uv_texture_spec(texq, p.material, index, p.u1, p.v1, p.u2, p.v2)
+	return create_uv_texture_spec(texq, p.material, p.u1, p.v1, p.u2, p.v2)
 end
 -- now for all faces
 -- interface texture_query -> Array 6 (Maybe TextureProps) -> Array 6 (TextureSpec)
