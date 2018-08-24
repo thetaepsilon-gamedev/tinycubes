@@ -84,7 +84,7 @@ local assert_int = function(v, label)
 end
 
 -- this texture intentionally doesn't exist
-local missingtex = "tinycubes_error.png"
+local missingtex = nil
 -- returns :: TextureSpec String
 local create_uv_texture_spec = function(...)
 	local texture, x, y, w, h = map_to_pixels(...)
