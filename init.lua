@@ -60,12 +60,13 @@ local b = 0.5
 local tb = "tinycubes_tinycube_"
 local tx = tb.."x.png"
 local ty = tb.."y.png"
+local tym = tb.."ym.png"
 local tz = tb.."z.png"
 minetest.register_entity(entity, {
 	hp_max = 1,
 	visual="cube",
 	visual_size=bsz,
-	textures = {ty, ty, tx, tx, tz, tz},
+	textures = {ty, tym, tx, tx, tz, tz},
 	physical=true,
 	collide_with_objects=true,
 	on_rightclick = function(self, clicker)

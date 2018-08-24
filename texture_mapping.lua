@@ -151,10 +151,11 @@ end
 -- tints for faces
 local tp = "^[multiply:"
 local tx = tp.."#D8D8D8"
-local ty = ""	-- Y faces are the baseline
+local ty = ""	-- upper Y faces are the baseline
+local tym = tp.."#A7A7A7"	-- lower Y face is the darkest
 local tz = tp.."#EEEEEE"
 -- per-face tints, organised according to face order for cube drawtype
-local tints = { ty, ty, tx, tx, tz, tz }
+local tints = { ty, tym, tx, tx, tz, tz }
 
 local create_textures = function(texq, faceprops)
 	-- curse you, starts-at-one-arraaaayyyyyssssssss
