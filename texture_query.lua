@@ -8,6 +8,8 @@
 {
 	node = "default:stone",		-- as you'd expect
 	... -- some more properties planned here, like brick overlays.
+	face = 1,	-- tiles index to use (as in def.tiles), 1 assumed if missing.
+		-- note that some nodes only define the one for all sides!
 }
 ]]
 local i = {}
@@ -21,7 +23,7 @@ local fail = function()
 end
 
 local defaultsize = 16
-local texq = function(material, index)
+local texq = function(material)
 	local n = material.node
 	if not n then return fail() end
 	local def = defs[n]
@@ -31,7 +33,10 @@ local texq = function(material, index)
 	local tiles = def.tiles
 	if not tiles then return fail() end
 
-	return tiles[index], defaultsize, defaultsize
+	local index = material.face or 1
+	local tex = tiles[index]
+	if not tex then return fail() end
+	return tex, defaultsize, defaultsize
 end
 i.texq = texq
 
