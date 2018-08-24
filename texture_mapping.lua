@@ -134,7 +134,7 @@ local transparent = "tinycubes_nodraw.png"
 ]]
 
 -- interface texture_query -> Int -> TextureProps -> TextureSpec
-local create_spec_from_properties = function(texq, index, properties)
+local create_spec_from_properties = function(texq, properties)
 	-- properties don't exist? use transparency
 	if properties == nil then return transparent end
 
@@ -150,7 +150,7 @@ local create_textures = function(texq, faceprops)
 	for i = 1, 6, 1 do
 		-- maybe nil, but this is handled by create_spec_from_properties
 		local props = faceprops[i]
-		local spec = create_spec_from_properties(texq, i, props)
+		local spec = create_spec_from_properties(texq, props)
 		specs[i] = spec
 	end
 	return specs
