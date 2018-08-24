@@ -65,7 +65,7 @@ minetest.register_entity(entity, {
 	hp_max = 1,
 	visual="cube",
 	visual_size=bsz,
-	textures = {tx, tx, ty, ty, tz, tz},
+	textures = {ty, ty, tx, tx, tz, tz},
 	physical=true,
 	collide_with_objects=true,
 	on_rightclick = function(self, clicker)
