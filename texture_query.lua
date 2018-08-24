@@ -36,6 +36,13 @@ local texq = function(material)
 	local index = material.face or 1
 	local tex = tiles[index]
 	if not tex then return fail() end
+
+	-- a tile's definition can sometimes be a table with properties.
+	-- entities don't really support most of these properties right now,
+	-- so if this occurs then we can't handle it.
+	-- otherwise this table might cause some nice crashes later on...
+	if type(tex) == "table" then return fail() end
+
 	return tex, defaultsize, defaultsize
 end
 i.texq = texq
