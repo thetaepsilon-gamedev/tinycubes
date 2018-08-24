@@ -102,7 +102,7 @@ local create_uv_texture_spec = function(...)
 	local dim = assert_int(w, "w").."x"..assert_int(h, "h")
 	local file = "("..texture..")"
 	local coordinates = assert_int(-x, "x")..","..assert_int(-y, "y")
-	local spec = "[combine:"..dim..":"..coordinates.."="..file
+	local spec = "([combine:"..dim..":"..coordinates.."="..file..")"
 	return spec
 end
 i.create_uv_texture_spec = create_uv_texture_spec
@@ -144,6 +144,18 @@ end
 -- now for all faces
 -- interface texture_query -> Array 6 (Maybe TextureProps) -> Array 6 (TextureSpec)
 -- faceprops would likely be provided from an entity's saved configuration.
+-- additionally, applies a ^[multiply tint to the returned textures,
+-- so that it mimics the slight face differences for blocks in the game;
+-- without it tiny cubes end up looking somewhat unnatural and out of place.
+
+-- tints for faces
+local tp = "^[combine:"
+local tx = tp.."#D8D8D8"
+local ty = ""	-- Y faces are the baseline
+local tz = tp.."#EEEEEE"
+-- per-face tints, organised according to face order for cube drawtype
+local tints = { tx, tx, ty, ty, tz, tz }
+
 local create_textures = function(texq, faceprops)
 	-- curse you, starts-at-one-arraaaayyyyyssssssss
 	local specs = {}
@@ -151,6 +163,8 @@ local create_textures = function(texq, faceprops)
 		-- maybe nil, but this is handled by create_spec_from_properties
 		local props = faceprops[i]
 		local spec = create_spec_from_properties(texq, props)
+		local tint = tints[i]
+		spec = spec .. tint
 		specs[i] = spec
 	end
 	return specs
