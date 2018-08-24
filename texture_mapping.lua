@@ -149,12 +149,12 @@ end
 -- without it tiny cubes end up looking somewhat unnatural and out of place.
 
 -- tints for faces
-local tp = "^[combine:"
+local tp = "^[multiply:"
 local tx = tp.."#D8D8D8"
 local ty = ""	-- Y faces are the baseline
 local tz = tp.."#EEEEEE"
 -- per-face tints, organised according to face order for cube drawtype
-local tints = { tx, tx, ty, ty, tz, tz }
+local tints = { ty, ty, tx, tx, tz, tz }
 
 local create_textures = function(texq, faceprops)
 	-- curse you, starts-at-one-arraaaayyyyyssssssss
