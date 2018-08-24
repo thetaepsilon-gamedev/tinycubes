@@ -53,7 +53,7 @@ query :: node_material -> Int -> Maybe (String, Int, Int)
 local floor = math.floor
 local ceil = math.ceil
 local map_to_pixels = function(texq, node, faceid, u1, v1, u2, v2)
-	local texture, width, height = texq(node, faceid)
+	local texture, width, height = texq(node)
 	-- if texture query returns nil, we return nil also.
 	-- this allows create_uv_texture_spec() below
 	-- to use a placeholder error texture.
