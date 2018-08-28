@@ -1,3 +1,6 @@
+-- internal access table for other components
+_mod = {}
+
 local unwrap = mtrequire("ds2.minetest.vectorextras.unwrap")
 
 local mn = minetest.get_current_modname()
@@ -69,9 +72,6 @@ minetest.register_entity(entity, {
 	textures = {ty, tym, tx, tx, tz, tz},
 	physical=true,
 	collide_with_objects=true,
-	on_rightclick = function(self, clicker)
-		prn("clicky")
-	end,
 	get_staticdata = lua_get_staticdata,
 	on_activate = mk_on_deserialize(cube_on_deserialize),
 })
@@ -90,7 +90,6 @@ local align = function(v, sp)
 	local sf = sfp(sp)
 	local c = 1 / (2 * sf)
 	local r = (math.floor(v * sf) / sf) + c
-	print("v", v, "r", r)
 	return r
 end
 
@@ -149,6 +148,9 @@ minetest.register_craftitem(item, {
 	inventory_image = t,
 	on_place = on_use_surface_only(on_place),
 })
+
+-- make sure internal table isn't exposed.
+_mod = nil
 
 
 
