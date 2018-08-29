@@ -145,7 +145,7 @@ end
 
 local item = mn..":tinycubetool"
 minetest.register_craftitem(item, {
-	inventory_image = t,
+	inventory_image = "tinycubes_tinycubetool.png",
 	on_place = on_use_surface_only(on_place),
 })
 
