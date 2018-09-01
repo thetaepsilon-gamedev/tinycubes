@@ -56,6 +56,17 @@ end
 
 
 
+-- placeholder testing rightclick handler...
+local blank = ItemStack("")
+local on_rightclick_item = function(self, clicker, itemstack)
+	local ref = minetest.add_item(self.object:get_pos(), itemstack)
+	if ref then return blank end
+end
+local mkadapter = dofile(mp.."entity_rightclick_itemstack_adapter.lua")
+local on_rightclick = mkadapter(on_rightclick_item)
+
+
+
 -- the base cube entity.
 -- it gets scaled down according to the size down below.
 local bsz = {x=1,y=1}
@@ -74,6 +85,7 @@ minetest.register_entity(entity, {
 	collide_with_objects=true,
 	get_staticdata = lua_get_staticdata,
 	on_activate = mk_on_deserialize(cube_on_deserialize),
+	on_rightclick = on_rightclick,
 })
 
 
