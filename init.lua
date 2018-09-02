@@ -9,6 +9,7 @@ _mod.modpath = mp
 local entity = mn..":tinycube"
 _mod.entity = {}
 _mod.entity.name = entity
+_mod.entity.apiname = "ds2.minetest.tinycubes.cube"
 
 local prn = minetest.chat_send_all
 local i = {}
