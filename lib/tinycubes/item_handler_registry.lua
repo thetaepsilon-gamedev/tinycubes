@@ -94,6 +94,42 @@ local hooks = {
 
 
 
+--[[
+Try to find a handler from minetest.registered_items.
+Because an item may support use with many entity APIs
+(which may have different abstractions -
+directly poking around inside get_luaentity() should be discouraged),
+we have to look at a sub-key for that specific API within the item def.
+]]
+local mk_itemdef_lookup = function(deps)
+	local registered_items = deps.deftable
+	assert(type(registered_items) == "table")
+	local apiname = deps.entity_api_name
+	assert(type(apiname) == "string")
+
+	return function(iteminfo)
+		local itemstring = iteminfo.itemstring
+		-- maybe make a WTF warning in the log if this fails...
+		local itemdef = registered_items[itemstring]
+		if itemdef == nil then return nil end
+
+		local uses = itemdef.on_entity_rightclick
+		if uses == nil then return nil end
+
+		-- unlike with the regtable based handlers below,
+		-- minetest.registered_items is not controlled by us,
+		-- and it won't validate the constraint of these being functions.
+		local fn = uses[apiname]
+		if fn == nil then return nil end
+		assert(type(fn) == "function")
+		return fn
+	end
+end
+
+
+
+
+
 -- set up query functions list for handler lookup
 local mkreg = mtrequire(pre.."datastructs.regtable").construct
 
@@ -123,6 +159,7 @@ local create_querylist = function(querylist_deps)
 
 	local gete = regtable_exact.get
 	local getm = regtable_mod.get
+	local getdef = mk_itemdef_lookup(querylist_deps.itemdef)
 	local getexact = function(iteminfo)
 		return gete(iteminfo.itemstring)
 	end
@@ -131,6 +168,7 @@ local create_querylist = function(querylist_deps)
 	end
 
 	local querylist = {
+		getdef,
 		getexact,
 		getmod,
 	}
