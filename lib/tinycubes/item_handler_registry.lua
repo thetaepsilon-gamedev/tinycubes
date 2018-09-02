@@ -97,7 +97,23 @@ local hooks = {
 -- set up query functions list for handler lookup
 local mkreg = mtrequire(pre.."datastructs.regtable").construct
 
-local create_querylist = function(mtdefs)
+--[[
+At this time, the instance specific information required in querylist_deps is:
+{
+	-- itemdef querier dependencies
+	itemdef = {
+		deftable = minetest.registered_items,
+			-- this must be passed in manually,
+			-- to allow this code to be tested outside of MT.
+		entity_api_name = "some.stable.api.name",
+			-- this is NOT the entity name string!
+			-- rather, this is a name referring to the passed interface object.
+			-- the handlers and mod must coordinate on this name,
+			-- and on the interface passed to any handler functions.
+	},
+}
+]]
+local create_querylist = function(querylist_deps)
 	local regtable_mod = mkreg(hooks)
 	local regtable_exact = mkreg(hooks)
 	local reg = {}
@@ -127,10 +143,9 @@ end
 
 
 -- finally plug the pieces together.
--- minetest.registered_nodes (or a similar table if under mock testing)
--- should be passed as the mtdefs argument for item def based lookup to work.
-local mk_registry = function(mtdefs)
-	local querylist, reg = create_querylist(mtdefs)
+-- see create_querylist() for the meaning of querylist_deps
+local mk_registry = function(querylist_deps)
+	local querylist, reg = create_querylist(querylist_deps)
 
 	local find_handler = function(itemstack)
 		return find_handler_inner(querylist, extractor, itemstack)

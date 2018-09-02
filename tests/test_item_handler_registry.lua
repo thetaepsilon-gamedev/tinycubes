@@ -1,7 +1,14 @@
 local construct = mtrequire("ds2.minetest.tinycubes.item_handler_registry")
--- fake minetest registered nodes table
-local defs = {}
-local lookup, register = construct(defs)
+-- fake minetest registered items table
+local registered_items = {}
+local apiname = "test.dummy_api"
+local deps = {
+	itemdef = {
+		deftable = registered_items,
+		entity_api_name = apiname,
+	}
+}
+local lookup, register = construct(deps)
 
 local mkfake = function(itemstr)
 	return {
