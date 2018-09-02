@@ -23,6 +23,25 @@ local texq = m_query.texq
 
 
 
+-- the proxy factory for the entity.
+-- this object (see libmthelpers: datastructs/proxy.lua)
+-- only allows certain methods on the base object to be called.
+local acl = {
+	get_cpos = function(self)
+		return self.object:get_pos()
+	end,
+	get_scale = function(self)
+		return self.config.scale
+	end
+}
+local lib = "com.github.thetaepsilon.minetest.libmthelpers"
+local m_proxy = mtrequire(lib..".datastructs.proxy")
+local interface_prefix = "interface_"
+local mk_proxy = m_proxy.proxy_factory_(acl, interface_prefix)
+
+
+
+
 -- on_deserialize for little cubes:
 -- currently just sets the size to the correct scale.
 local sfp = _mod.util.sfp
@@ -51,6 +70,9 @@ local cube_on_deserialize = function(self, config, dtime_s)
 		textures=textures,
 	})
 
+	-- create the proxy object for later use.
+	self.proxy = mk_proxy(self)
+
 	self.config = config
 	return true
 end
@@ -69,6 +91,8 @@ local deps = {
 }
 local find_handler, register = mkreg(deps)
 
+
+
 -- then, define the right-click handler:
 -- if any item-specific handler is found, call that,
 -- and expect it to know about the itemstack logic.
@@ -79,8 +103,7 @@ local on_rightclick_item = function(self, clicker, itemstack)
 	-- TODO: the API is not yet defined,
 	-- so just yell some debug text for now
 	if handler then
-		prn("handler " .. tostring(handler) ..
-			" found for entity, API not implemented")
+		handler(self.proxy, clicker, itemstack)
 	else
 		-- no handler? do nothing, preserve itemstack
 		return nil
