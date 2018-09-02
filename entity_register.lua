@@ -59,11 +59,32 @@ end
 
 
 
--- placeholder testing rightclick handler...
-local blank = ItemStack("")
+-- create the right-click handler registry for this entity.
+local mkreg = mtrequire("ds2.minetest.tinycubes.item_handler_registry")
+local deps = {
+	itemdef = {
+		deftable = minetest.registered_items,
+		entity_api_name = _mod.entity.apiname,
+	}
+}
+local find_handler, register = mkreg(deps)
+
+-- then, define the right-click handler:
+-- if any item-specific handler is found, call that,
+-- and expect it to know about the itemstack logic.
+-- if no handler, return nil so that the wielded itemstack is preserved.
+local prn = minetest.chat_send_all
 local on_rightclick_item = function(self, clicker, itemstack)
-	local ref = minetest.add_item(self.object:get_pos(), itemstack)
-	if ref then return blank end
+	local handler = find_handler(itemstack)
+	-- TODO: the API is not yet defined,
+	-- so just yell some debug text for now
+	if handler then
+		prn("handler " .. tostring(handler) ..
+			" found for entity, API not implemented")
+	else
+		-- no handler? do nothing, preserve itemstack
+		return nil
+	end
 end
 local mkadapter = dofile(mp.."entity_rightclick_itemstack_adapter.lua")
 local on_rightclick = mkadapter(on_rightclick_item)
