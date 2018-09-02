@@ -1,4 +1,7 @@
-local i = mtrequire("ds2.minetest.tinycubes.item_handler_registry")
+local construct = mtrequire("ds2.minetest.tinycubes.item_handler_registry")
+-- fake minetest registered nodes table
+local defs = {}
+local lookup, register = construct(defs)
 
 local mkfake = function(itemstr)
 	return {
@@ -9,7 +12,6 @@ local fakeitem = mkfake("default:stone")
 
 
 
-local lookup = i.find_handler
 local reject = function(item)
 	local handler, info = lookup(item)
 	assert(handler == nil)
@@ -29,7 +31,7 @@ reject(fakeitem)
 -- register some handler for the entire mod "default"
 local dummyf = function() return function() end end
 local f1 = dummyf()
-i.register.wholemod("default", f1)
+register.wholemod("default", f1)
 -- now we expect it to return that handler.
 acceptf(fakeitem, f1)
 
@@ -44,7 +46,7 @@ local f2 = dummyf()
 -- before...
 acceptf(fakeitem, f1)
 -- then...
-i.register.exact("default:stone", f2)
+register.exact("default:stone", f2)
 -- and after
 acceptf(fakeitem, f2)
 

@@ -96,37 +96,50 @@ local hooks = {
 
 -- set up query functions list for handler lookup
 local mkreg = mtrequire(pre.."datastructs.regtable").construct
-local regtable_mod = mkreg(hooks)
-local regtable_exact = mkreg(hooks)
-local reg = {}
-reg.exact = regtable_exact.register
-reg.wholemod = regtable_mod.register
-i.register = reg
 
-local gete = regtable_exact.get
-local getm = regtable_mod.get
-local getexact = function(iteminfo)
-	return gete(iteminfo.itemstring)
+local create_querylist = function(mtdefs)
+	local regtable_mod = mkreg(hooks)
+	local regtable_exact = mkreg(hooks)
+	local reg = {}
+
+	reg.exact = regtable_exact.register
+	reg.wholemod = regtable_mod.register
+
+	local gete = regtable_exact.get
+	local getm = regtable_mod.get
+	local getexact = function(iteminfo)
+		return gete(iteminfo.itemstring)
+	end
+	local getmod = function(iteminfo)
+		return getm(iteminfo.modname)
+	end
+
+	local querylist = {
+		getexact,
+		getmod,
+	}
+
+	return querylist, reg
 end
-local getmod = function(iteminfo)
-	return getm(iteminfo.modname)
+
+
+
+
+
+-- finally plug the pieces together.
+-- minetest.registered_nodes (or a similar table if under mock testing)
+-- should be passed as the mtdefs argument for item def based lookup to work.
+local mk_registry = function(mtdefs)
+	local querylist, reg = create_querylist(mtdefs)
+
+	local find_handler = function(itemstack)
+		return find_handler_inner(querylist, extractor, itemstack)
+	end
+
+	return find_handler, reg
 end
-local querylist = {
-	getexact,
-	getmod,
-}
 
 
 
-
-
--- finally plug the pieces together
-local find_handler = function(itemstack)
-	return find_handler_inner(querylist, extractor, itemstack)
-end
-i.find_handler = find_handler
-
-
-
-return i
+return mk_registry
 
