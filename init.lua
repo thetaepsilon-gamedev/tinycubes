@@ -4,6 +4,7 @@ _mod = {}
 local unwrap = mtrequire("ds2.minetest.vectorextras.unwrap")
 
 local mn = minetest.get_current_modname()
+_mod.modname = mn
 local mp = minetest.get_modpath(mn).."/"
 _mod.modpath = mp
 local entity = mn..":tinycube"
@@ -97,8 +98,17 @@ minetest.register_craftitem(item, {
 	on_place = on_use_surface_only(on_place),
 })
 
+
+
+
+
+-- register some extra items
+dofile(mp.."extraitems.lua")
+
 -- make sure internal table isn't exposed.
 _mod = nil
+
+
 
 
 
