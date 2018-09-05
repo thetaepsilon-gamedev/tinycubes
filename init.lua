@@ -80,16 +80,25 @@ i.add_tiny_cube = add_tiny_cube
 -- assumes a node pointed thing with surface pos.
 -- places a tiny cube "above" the pointed face.
 local tiny = 0.00001
+local bp = 4	-- TODO: pull this from the itemstack's metadata?
+local place_cube_from_surface_dir = function(surface, direction, sp)
+	local offset = vector.multiply(direction, tiny)
+	--print("offset", dump(offset))
+	-- add this to the surface pos to make sure positions round in the way we want.
+	-- this prevents rounding direction ambiguities due to
+	-- the surface pos being on a .5 boundary between nodes.
+	local target = vector.add(surface, offset)
+	-- then let the above routine handle alignment.
+	return add_tiny_cube_raw(sp, target.x, target.y, target.z)
+end
 local on_place = function(itemstack, user, pointed)
 	-- work out which face and which direction.
 	-- do this by comparing the above and below, then scaling down.
-	local diff = vector.subtract(pointed.above, pointed.under)
-	local offset = vector.multiply(diff, tiny)
-	--print("offset", dump(offset))
-	-- add this to the surface pos to make sure positions round in the way we want.
-	local bp = 4
-	local target = vector.add(pointed.surface, offset)
-	add_tiny_cube_raw(bp, target.x, target.y, target.z)
+	local direction = vector.subtract(pointed.above, pointed.under)
+
+	-- NB: do NOT do "return" here, as on_place() must return an itemstack!
+	-- (whereas the the following returns an entity ref)
+	place_cube_from_surface_dir(pointed.surface, direction, bp)
 end
 
 local item = mn..":tinycubetool"
